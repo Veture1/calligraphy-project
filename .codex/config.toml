@@ -1,0 +1,10 @@
+# Compound Agent project configuration for Codex.
+# Codex loads this file only after the repository is trusted.
+
+[features]
+hooks = true
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 8
+interrupt_message = true

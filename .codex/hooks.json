@@ -1,0 +1,34 @@
+{
+  "description": "Load Compound Agent memory into trusted Codex sessions.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/bin/ca\" prime",
+            "commandWindows": "powershell.exe -NoProfile -Command \"$repoRoot = git rev-parse --show-toplevel; node (Join-Path $repoRoot 'bin/ca') prime\"",
+            "timeout": 20,
+            "statusMessage": "Loading Compound Agent memory",
+            "additionalContextLimit": 6000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/bin/ca\" hooks run user-prompt",
+            "commandWindows": "powershell.exe -NoProfile -Command \"$repoRoot = git rev-parse --show-toplevel; node (Join-Path $repoRoot 'bin/ca') hooks run user-prompt\"",
+            "timeout": 10,
+            "statusMessage": "Checking Compound Agent memory",
+            "additionalContextLimit": 2500
+          }
+        ]
+      }
+    ]
+  }
+}

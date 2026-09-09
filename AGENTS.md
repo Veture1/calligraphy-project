@@ -1,15 +1,15 @@
 # Agent Instructions
 
 This document provides machine-readable context for AI agents working on this codebase.
-
-For detailed project rules and TDD workflow, see `.claude/CLAUDE.md`.
+Codex reads this file natively. Shared project rules live here; `.claude/CLAUDE.md`
+is additional reference material for the Claude harness.
 
 ---
 
 ## Project Overview
 
 **Name**: Compound Agent
-**Purpose**: Learning system that helps Claude Code avoid repeating mistakes across sessions
+**Purpose**: Learning system that helps coding agents avoid repeating mistakes across sessions
 **Stack**: Go (primary) + Rust (embedding daemon) + Node/pnpm (npm wrapper distribution)
 **CLI**: `ca` (alias: `compound-agent`), built with Cobra
 **Module**: `github.com/nathandelacretaz/compound-agent`
@@ -74,7 +74,30 @@ rust/
     └── index.jsonl             <- Source of truth (git-tracked)
 .claude/.cache/
     └── lessons.sqlite          <- Rebuildable index (.gitignore)
+.codex/
+├── config.toml                 <- Codex project configuration
+├── hooks.json                  <- Codex-native memory hooks
+└── agents/                     <- Codex custom subagent roles
+.agents/skills/                 <- Codex-native compound workflow skills
 ```
+
+### Codex Native Interface
+
+Codex uses these repository-scoped files directly:
+
+- `AGENTS.md` for persistent project instructions
+- `.codex/config.toml` for project configuration
+- `.codex/hooks.json` for lifecycle hooks
+- `.codex/agents/*.toml` for custom subagents
+- `.agents/skills/*/SKILL.md` for reusable workflows
+
+Claude-specific paths remain source material and compatibility assets. Do not assume
+that `.claude/settings.json`, `.claude/commands/`, or `.claude/agents/` are loaded by
+Codex. In Codex, invoke the native skills with `$compound-spec-dev`, `$compound-plan`,
+`$compound-work`, `$compound-review`, `$compound-learn`, or `$compound-cook-it`.
+
+Use `ca` when it is on `PATH`; in this source checkout, run `node bin/ca` from the
+repository root after installing dependencies when the standalone binary is unavailable.
 
 ---
 
@@ -265,18 +288,18 @@ db.QueryRow(fmt.Sprintf("SELECT * FROM lessons WHERE id = '%s'", id))
 
 ## Compound Agent Integration
 
-This section explains HOW and WHEN Claude should interact with the compound-agent memory system.
+This section explains how supported coding agents interact with the compound-agent memory system.
 
 ### Workflow Commands
 
-| Command | Phase | Description |
-|---------|-------|-------------|
-| `/compound:spec-dev` | Spec Dev | Develop precise specifications through Socratic dialogue, EARS notation, and Mermaid diagrams |
-| `/compound:plan` | Plan | Create structured plan enriched by semantic memory |
-| `/compound:work` | Work | Execute plan with agent teams and TDD |
-| `/compound:review` | Review | Multi-agent review with inter-communication |
-| `/compound:compound` | Compound | Capture knowledge, feed back into memory |
-| `/compound:cook-it` | All | Chain all 5 phases sequentially |
+| Claude command | Codex skill | Phase | Description |
+|----------------|-------------|-------|-------------|
+| `/compound:spec-dev` | `$compound-spec-dev` | Spec Dev | Develop precise, testable specifications |
+| `/compound:plan` | `$compound-plan` | Plan | Create a structured plan enriched by memory |
+| `/compound:work` | `$compound-work` | Work | Execute the plan with TDD and focused subagents |
+| `/compound:review` | `$compound-review` | Review | Run parallel, evidence-based review |
+| `/compound:compound` | `$compound-learn` | Compound | Capture durable lessons |
+| `/compound:cook-it` | `$compound-cook-it` | All | Chain all five phases sequentially |
 
 ### CLI
 
@@ -303,7 +326,9 @@ This section explains HOW and WHEN Claude should interact with the compound-agen
 
 #### Session Start (Automatic via hooks)
 
-`ca load-session` runs automatically via `.claude/settings.json` hooks at SessionStart and PreCompact.
+Claude uses `.claude/settings.json`. Codex uses `.codex/hooks.json`. Both invoke
+`ca prime` to inject high-severity lessons at session start; Codex also runs the
+user-prompt memory reminder through its native `UserPromptSubmit` hook.
 
 #### Before Architectural Decisions
 
@@ -380,6 +405,12 @@ Run `ca init` in a project root to configure:
 - `.claude/commands/` - Slash commands (/learn, /show, /wrong, /stats)
 - `.claude/skills/compound/` - Workflow skills (cook-it, spec-dev, plan, work, review, compound)
 - Pre-commit hook - Capture reminder
+
+This repository checks in its native `.codex/` configuration and `.agents/skills/`
+workflows so a trusted Codex session can discover them without translating Claude slash
+commands. The current `ca setup --harness codex` installer still emits the legacy
+configuration template and does not install these hooks, agents, or skills; do not run
+it over this checkout until the installer templates have been upgraded.
 
 ---
 
