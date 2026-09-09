@@ -1,0 +1,201 @@
+---
+version: "{{VERSION}}"
+last-updated: "{{DATE}}"
+summary: "Complete CLI command reference for compound-agent"
+---
+
+# CLI Reference
+
+All commands use `ca` (or `npx ca` if not in PATH). Global flags: `-v, --verbose` and `-q, --quiet`.
+
+---
+
+## Capture commands
+
+```bash
+# Capture a lesson (primary command)
+ca learn "Always validate epic IDs before shell execution" \
+  --trigger "Shell injection via bd show" \
+  --tags "security,validation" \
+  --severity high \
+  --type lesson
+
+# Capture a pattern (requires --pattern-bad and --pattern-good)
+ca learn "Use execFileSync instead of execSync" \
+  --type pattern \
+  --pattern-bad "execSync(\`bd show \${id}\`)" \
+  --pattern-good "execFileSync('bd', ['show', id])"
+
+# Capture from trigger/insight flags
+ca capture --trigger "Tests failed after refactor" --insight "Run full suite after moving files" --yes
+
+# Detect learning triggers from input file
+ca detect --input corrections.json
+ca detect --input corrections.json --save --yes
+```
+
+**Types**: `lesson` (default), `solution`, `pattern`, `preference`
+**Severity**: `high`, `medium`, `low`
+
+## Retrieval commands
+
+```bash
+ca search "sqlite validation"           # Keyword search
+ca search "security" --limit 5
+ca list                                  # List all memory items
+ca list --limit 20
+ca list --invalidated                    # Show only invalidated items
+ca check-plan --plan "Implement caching layer for API responses"
+echo "Add caching layer" | ca check-plan # Semantic search against a plan
+ca load-session                          # Load high-severity lessons
+ca load-session --json
+```
+
+## Management commands
+
+```bash
+ca show <id>                             # View a specific item
+ca show <id> --json
+ca update <id> --insight "Updated text"  # Update item fields
+ca update <id> --severity high --tags "security,input-validation"
+ca delete <id>                           # Soft delete (creates tombstone)
+ca delete <id1> <id2> <id3>
+ca wrong <id> --reason "Incorrect"       # Mark as invalid
+ca validate <id>                         # Re-enable an invalidated item
+ca export                                # Export as JSON
+ca export --since 2026-01-01 --tags "security"
+ca import lessons-backup.jsonl           # Import from JSONL file
+ca compact                               # Remove tombstones and rebuild index
+ca compact --dry-run
+ca compact --force
+ca rebuild                               # Rebuild SQLite index from JSONL
+ca rebuild --force
+ca stats                                 # Show database health and statistics
+ca prime                                 # Reload workflow context after compaction
+```
+
+## Setup commands
+
+```bash
+ca init                    # Initialize in current repo
+ca init --skip-agents      # Skip AGENTS.md and template installation
+ca init --skip-hooks       # Skip git hook installation
+ca init --skip-claude      # Skip Claude Code hooks
+ca init --json             # Output result as JSON
+ca setup                   # Full setup (init + hooks + templates)
+ca setup --harness claude  # Select coding harness (claude|codex|agy|goose)
+ca setup --update          # Regenerate templates (preserves user files)
+ca setup --uninstall       # Remove compound-agent integration
+ca setup --status          # Show installation status
+ca setup claude            # Install Claude Code hooks only
+ca setup claude --status   # Check hook status
+ca setup claude --dry-run  # Preview changes without writing
+ca setup claude --global   # Use global ~/.claude/ settings
+ca setup claude --uninstall # Remove compound-agent hooks
+ca download-model          # Download embedding model (~23MB)
+ca download-model --json   # Output result as JSON
+```
+
+**`--harness`** (`claude` | `codex` | `agy` | `goose`): selects the coding harness to configure. The `agy` target installs AGENTS.md for the Antigravity CLI (`agy`), the functional loop engine that replaces the standalone gemini CLI. The deprecated `gemini` and `antigravity` aliases still resolve to `agy` with a warning.
+
+## Reviewer commands
+
+```bash
+ca reviewer enable agy     # Enable Antigravity (agy) as external reviewer
+ca reviewer enable codex   # Enable Codex as external reviewer
+ca reviewer disable agy    # Disable a reviewer
+ca reviewer list           # List enabled reviewers
+```
+
+## Loop command
+
+```bash
+ca loop                    # Generate infinity loop script (default backend: bg = claude --bg)
+ca loop --epics "epic-1,epic-2"
+ca loop --output my-loop.sh
+ca loop --max-retries 5
+ca loop --model claude-opus-4-7[1m]
+ca loop --implementer claude   # Default implementer (supports --backend bg|p)
+ca loop --implementer goose    # Open/local models, e.g. --model ollama/qwen2.5-coder:14b
+ca loop --implementer codex    # Default model gpt-5.5-codex (codex exec)
+ca loop --implementer agy      # Default model gemini-3.1-pro (agy -p --dangerously-skip-permissions --model)
+ca loop --backend bg       # Default: claude --bg (subscription-billed)
+ca loop --backend p        # Legacy: claude -p (pay-per-token)
+ca loop --force            # Overwrite existing script
+# Env override (when --backend not set): CA_BACKEND=p ca loop
+```
+
+**`--implementer`** (`claude` | `goose` | `codex` | `agy`): selects the coding harness that runs the loop. Default is `claude`.
+
+- **claude**: supports `--backend bg|p`.
+- **goose**: runs open and local models (for example `--model ollama/qwen2.5-coder:14b`); sets `GOOSE_TOOLSHIM=1` automatically for ollama models.
+- **codex**: default model `gpt-5.5-codex`, run via `codex exec`.
+- **agy**: default model `gemini-3.1-pro`, run via `agy -p --dangerously-skip-permissions --model` (OAuth auth, no API-key env var). The deprecated `gemini` and `antigravity` aliases still resolve to `agy` with a warning.
+
+For the `codex` and `agy` implementers, valid `--reviewers` are `codex` and `agy`.
+
+**`--backend`** (`bg` | `p`): applies to the `claude` implementer. `bg` (default) runs `claude --bg` (subscription-billed); `p` runs `claude -p` (legacy, pay-per-token).
+
+## Watch command
+
+```bash
+ca watch                             # Tail live trace from latest loop session
+ca watch --epic <id>                 # Watch a specific epic trace
+ca watch --no-follow                 # Print existing trace and exit
+```
+
+## Info command
+
+```bash
+ca info                    # Show project status, phase, and telemetry summary
+ca info --open             # Open project dashboard in browser
+ca info --json             # Output as JSON
+```
+
+## Health command
+
+```bash
+ca health                  # Check project health and dependencies
+```
+
+## Polish command
+
+```bash
+ca polish                  # Generate polish loop script (default backend: bg = claude --bg)
+ca polish --spec-file "docs/specs/my-spec.md"
+ca polish --meta-epic "meta-epic-id"
+ca polish --reviewers "claude-sonnet,claude-opus,agy,codex"
+ca polish --cycles 2
+ca polish --model claude-opus-4-7[1m]
+ca polish --backend bg     # Default: claude --bg (subscription-billed)
+ca polish --backend p      # Legacy: claude -p (pay-per-token)
+ca polish --force          # Overwrite existing script
+```
+
+## Feedback command
+
+```bash
+ca feedback                # Submit feedback about compound-agent
+```
+
+## Health, audit, and verification commands
+
+```bash
+ca about                    # Show version, animation, and recent changelog
+ca doctor                  # Check external dependencies and project health
+ca audit                   # Run pattern, rule, and lesson quality checks
+ca rules check             # Check codebase against .claude/rules.json
+ca test-summary            # Run tests and output compact pass/fail summary
+ca verify-gates <epic-id>  # Verify workflow gates before epic closure
+ca phase-check init <epic-id>
+ca phase-check status
+ca phase-check start <phase>
+ca phase-check gate <gate-name>   # post-plan, gate-3, gate-4, final
+ca phase-check clean
+```
+
+## Compound command
+
+```bash
+ca compound                # Synthesize cross-cutting patterns from accumulated lessons
+```

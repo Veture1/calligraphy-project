@@ -1,0 +1,293 @@
+// Package templates provides embedded template files for compound-agent setup.
+// Templates are embedded at compile time using //go:embed directives.
+package templates
+
+import (
+	"embed"
+	"io/fs"
+	"path"
+	"strings"
+)
+
+//go:embed agents/*.md
+var agentsFS embed.FS
+
+//go:embed commands/*.md
+var commandsFS embed.FS
+
+//go:embed skills
+var skillsFS embed.FS
+
+//go:embed agent-role-skills
+var agentRoleSkillsFS embed.FS
+
+//go:embed docs/*.md
+var docsFS embed.FS
+
+//go:embed docs/research
+var researchFS embed.FS
+
+//go:embed agents-md.md
+var agentsMdTemplate string
+
+//go:embed claude-md-reference.md
+var claudeMdReference string
+
+//go:embed plugin.json
+var pluginJSON string
+
+//go:embed harness/goose/hooks.json
+var gooseHooksJSON string
+
+//go:embed harness/goose/goosehints
+var gooseHints string
+
+//go:embed harness/goose/compound-cook-it.yaml
+var gooseRecipe string
+
+//go:embed harness/goose/compound-review.yaml
+var gooseReviewRecipe string
+
+//go:embed harness/goose/review-security.yaml
+var gooseReviewSecurity string
+
+//go:embed harness/goose/review-correctness.yaml
+var gooseReviewCorrectness string
+
+//go:embed harness/goose/review-quality.yaml
+var gooseReviewQuality string
+
+//go:embed harness/codex/config.toml
+var codexConfig string
+
+//go:embed harness/agy/AGENTS.md
+var agyMemory string
+
+// Markers for idempotent section detection.
+const (
+	CompoundAgentSectionHeader = "## Compound Agent Integration"
+	ClaudeRefStartMarker       = "<!-- compound-agent:claude-ref:start -->"
+	ClaudeRefEndMarker         = "<!-- compound-agent:claude-ref:end -->"
+	AgentsSectionStartMarker   = "<!-- compound-agent:start -->"
+	AgentsSectionEndMarker     = "<!-- compound-agent:end -->"
+	AntigravityStartMarker     = "<!-- compound-agent:antigravity:start -->"
+	AntigravityEndMarker       = "<!-- compound-agent:antigravity:end -->"
+)
+
+// AgentsMdTemplate returns the AGENTS.md section template.
+func AgentsMdTemplate() string {
+	return agentsMdTemplate
+}
+
+// ClaudeMdReference returns the CLAUDE.md reference snippet.
+func ClaudeMdReference() string {
+	return claudeMdReference
+}
+
+// PluginJSON returns the plugin.json template with {{VERSION}} placeholder.
+func PluginJSON() string {
+	return pluginJSON
+}
+
+// GooseHooksJSON returns the Goose hooks manifest with the {{BIN}} placeholder.
+func GooseHooksJSON() string {
+	return gooseHooksJSON
+}
+
+// GooseHints returns the Goose .goosehints memory file.
+func GooseHints() string {
+	return gooseHints
+}
+
+// GooseRecipe returns the compound-cook-it Goose recipe YAML.
+func GooseRecipe() string {
+	return gooseRecipe
+}
+
+// GooseReviewRecipe returns the parent compound-review Goose recipe YAML, a
+// heterogeneous review-fleet that fans out to the reviewer subrecipes.
+func GooseReviewRecipe() string {
+	return gooseReviewRecipe
+}
+
+// GooseReviewSubrecipes returns a map of recipe-filename -> content for the
+// open-model review fleet's reviewer subrecipes (security, correctness,
+// quality). Each carries its own settings model pin and a response.json_schema
+// verdict so weak models still emit a structured, detectable result.
+func GooseReviewSubrecipes() map[string]string {
+	return map[string]string{
+		"review-security.yaml":    gooseReviewSecurity,
+		"review-correctness.yaml": gooseReviewCorrectness,
+		"review-quality.yaml":     gooseReviewQuality,
+	}
+}
+
+// CodexConfig returns the Codex config.toml with the {{VERSION}} placeholder.
+func CodexConfig() string {
+	return codexConfig
+}
+
+// AgyMemory returns the Antigravity CLI (agy) AGENTS.md protocol section. It is
+// appended (not whole-file written) so it coexists with the shared lesson
+// section that codex/claude write to AGENTS.md.
+func AgyMemory() string {
+	return agyMemory
+}
+
+// AntigravitySectionHeader marks the agy protocol section for idempotent append
+// detection. The header text is kept stable for install idempotency across
+// upgrades from the legacy antigravity groundwork target.
+const AntigravitySectionHeader = "## Compound Agent Protocol (Antigravity)"
+
+// AgentTemplates returns a map of filename -> content for agent .md files.
+func AgentTemplates() map[string]string {
+	return readEmbedDir(agentsFS, "agents")
+}
+
+// CommandTemplates returns a map of filename -> content for command .md files.
+func CommandTemplates() map[string]string {
+	return readEmbedDir(commandsFS, "commands")
+}
+
+// PhaseSkills returns a map of phase-name -> SKILL.md content.
+func PhaseSkills() map[string]string {
+	result := make(map[string]string)
+	_ = fs.WalkDir(skillsFS, "skills", func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		if path.Base(p) == "SKILL.md" {
+			// Extract phase name: "skills/<phase>/SKILL.md" -> "<phase>"
+			parts := strings.Split(p, "/")
+			if len(parts) >= 3 {
+				phase := parts[1]
+				data, readErr := fs.ReadFile(skillsFS, p)
+				if readErr == nil {
+					result[phase] = string(data)
+				}
+			}
+		}
+		return nil
+	})
+	return result
+}
+
+// PhaseSkillReferences returns a map of "phase/relative-path" -> content
+// for reference files alongside phase skills.
+func PhaseSkillReferences() map[string]string {
+	result := make(map[string]string)
+	_ = fs.WalkDir(skillsFS, "skills", func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		if path.Base(p) == "SKILL.md" {
+			return nil // Skip SKILL.md itself
+		}
+		// Path: "skills/<phase>/references/<file>.md"
+		// Key: "<phase>/references/<file>.md"
+		parts := strings.Split(p, "/")
+		if len(parts) >= 2 {
+			relPath := strings.Join(parts[1:], "/") // strip "skills/" prefix
+			data, readErr := fs.ReadFile(skillsFS, p)
+			if readErr == nil {
+				result[relPath] = string(data)
+			}
+		}
+		return nil
+	})
+	return result
+}
+
+// AgentRoleSkills returns a map of role-name -> SKILL.md content.
+func AgentRoleSkills() map[string]string {
+	result := make(map[string]string)
+	_ = fs.WalkDir(agentRoleSkillsFS, "agent-role-skills", func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		if path.Base(p) == "SKILL.md" {
+			// Extract role name: "agent-role-skills/<role>/SKILL.md" -> "<role>"
+			parts := strings.Split(p, "/")
+			if len(parts) >= 3 {
+				role := parts[1]
+				data, readErr := fs.ReadFile(agentRoleSkillsFS, p)
+				if readErr == nil {
+					result[role] = string(data)
+				}
+			}
+		}
+		return nil
+	})
+	return result
+}
+
+// AgentRoleSkillReferences returns a map of "role/relative-path" -> content
+// for reference files alongside agent role skills.
+func AgentRoleSkillReferences() map[string]string {
+	result := make(map[string]string)
+	_ = fs.WalkDir(agentRoleSkillsFS, "agent-role-skills", func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		if path.Base(p) == "SKILL.md" {
+			return nil // Skip SKILL.md itself
+		}
+		// Path: "agent-role-skills/<role>/references/<file>.md"
+		// Key: "<role>/references/<file>.md"
+		parts := strings.Split(p, "/")
+		if len(parts) >= 2 {
+			relPath := strings.Join(parts[1:], "/") // strip "agent-role-skills/" prefix
+			data, readErr := fs.ReadFile(agentRoleSkillsFS, p)
+			if readErr == nil {
+				result[relPath] = string(data)
+			}
+		}
+		return nil
+	})
+	return result
+}
+
+// DocTemplates returns a map of filename -> content for documentation .md files.
+// Content includes {{VERSION}} and {{DATE}} placeholders for substitution.
+func DocTemplates() map[string]string {
+	return readEmbedDir(docsFS, "docs")
+}
+
+// ResearchDocs returns a map of relative-path -> content for research documentation.
+// Paths are relative to the research root (e.g., "security/overview.md", "index.md").
+func ResearchDocs() map[string]string {
+	const root = "docs/research"
+	result := make(map[string]string)
+	_ = fs.WalkDir(researchFS, root, func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		// Strip "docs/research/" prefix to get relative path
+		rel := strings.TrimPrefix(p, root+"/")
+		data, readErr := fs.ReadFile(researchFS, p)
+		if readErr == nil {
+			result[rel] = string(data)
+		}
+		return nil
+	})
+	return result
+}
+
+// readEmbedDir reads all files from an embedded FS directory into a map.
+func readEmbedDir(fsys embed.FS, dir string) map[string]string {
+	result := make(map[string]string)
+	entries, err := fs.ReadDir(fsys, dir)
+	if err != nil {
+		return result
+	}
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		data, readErr := fs.ReadFile(fsys, path.Join(dir, entry.Name()))
+		if readErr == nil {
+			result[entry.Name()] = string(data)
+		}
+	}
+	return result
+}
