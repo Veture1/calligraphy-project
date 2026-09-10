@@ -3,29 +3,29 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|resume|clear|compact",
         "hooks": [
           {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/bin/ca\" prime",
-            "commandWindows": "powershell.exe -NoProfile -Command \"$repoRoot = git rev-parse --show-toplevel; node (Join-Path $repoRoot 'bin/ca') prime\"",
-            "timeout": 20,
+            "additionalContextLimit": 6000,
+            "command": "CA_MANAGED_HOOK=compound-agent-v1 '/mnt/c/Users/ROG/AppData/Roaming/npm/ca' prime 2\u003e/dev/null || true",
+            "commandWindows": "$env:CA_MANAGED_HOOK='compound-agent-v1'; \u0026 'C:\\Users\\ROG\\AppData\\Roaming\\npm\\ca.exe' prime 2\u003e$null; exit 0",
             "statusMessage": "Loading Compound Agent memory",
-            "additionalContextLimit": 6000
+            "timeout": 20,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "startup|resume|clear|compact"
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/bin/ca\" hooks run user-prompt",
-            "commandWindows": "powershell.exe -NoProfile -Command \"$repoRoot = git rev-parse --show-toplevel; node (Join-Path $repoRoot 'bin/ca') hooks run user-prompt\"",
-            "timeout": 10,
+            "additionalContextLimit": 2500,
+            "command": "CA_MANAGED_HOOK=compound-agent-v1 '/mnt/c/Users/ROG/AppData/Roaming/npm/ca' hooks run user-prompt 2\u003e/dev/null || true",
+            "commandWindows": "$env:CA_MANAGED_HOOK='compound-agent-v1'; \u0026 'C:\\Users\\ROG\\AppData\\Roaming\\npm\\ca.exe' hooks run user-prompt 2\u003e$null; exit 0",
             "statusMessage": "Checking Compound Agent memory",
-            "additionalContextLimit": 2500
+            "timeout": 10,
+            "type": "command"
           }
         ]
       }

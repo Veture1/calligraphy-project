@@ -1,0 +1,69 @@
+.page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 96rpx 48rpx 64rpx;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow {
+  color: #8b3a2b;
+  font-size: 24rpx;
+  letter-spacing: 8rpx;
+}
+
+.title {
+  margin-top: 24rpx;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 64rpx;
+  line-height: 1.35;
+}
+
+.description {
+  margin-top: 24rpx;
+  color: #71695f;
+  font-size: 30rpx;
+  line-height: 1.8;
+}
+
+.practice-card {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 88rpx;
+  padding: 40rpx;
+  background: #fffdf8;
+  border: 1rpx solid #ddd3c3;
+  border-radius: 24rpx;
+  box-shadow: 0 16rpx 48rpx rgba(65, 52, 37, 0.08);
+}
+
+.label,
+.copybook {
+  display: block;
+}
+
+.label,
+.count {
+  color: #81786e;
+  font-size: 24rpx;
+}
+
+.copybook {
+  margin-top: 12rpx;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 44rpx;
+}
+
+.primary-button {
+  margin-top: 40rpx;
+  color: #fffaf0;
+  background: #202723;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  line-height: 96rpx;
+}
+

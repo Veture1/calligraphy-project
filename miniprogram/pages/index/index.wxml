@@ -1,0 +1,18 @@
+<view class="page">
+  <view class="hero">
+    <text class="eyebrow">每日一练</text>
+    <text class="title">静心落笔，日有所进</text>
+    <text class="description">从一帖一字开始，记录你的书法练习。</text>
+  </view>
+
+  <view class="practice-card">
+    <view>
+      <text class="label">今日临帖</text>
+      <text class="copybook">{{featuredCopybook}}</text>
+    </view>
+    <text class="count">已练 {{practiceCount}} 次</text>
+  </view>
+
+  <button class="primary-button" bindtap="startPractice">开始练习</button>
+</view>
+

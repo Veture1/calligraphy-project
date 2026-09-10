@@ -1,6 +1,0 @@
-description = "Load compound-agent workflow context after compaction or context loss"
-prompt = """
-@{.claude/commands/compound/prime.md}
-
-{{args}}
-"""

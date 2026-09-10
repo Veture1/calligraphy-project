@@ -1,66 +1,13 @@
 {
-  "name": "compound-agent",
-  "version": "2.12.1",
-  "type": "module",
-  "description": "Learning system for Claude Code — avoids repeating mistakes across sessions",
-  "bin": {
-    "ca": "./bin/ca",
-    "compound-agent": "./bin/ca"
-  },
+  "name": "calligraphy-project",
+  "version": "0.1.0",
+  "private": true,
+  "description": "书法学习微信小程序",
   "scripts": {
-    "postinstall": "node scripts/postinstall.cjs"
+    "typecheck": "tsc --noEmit"
   },
-  "files": [
-    "bin/",
-    "scripts/postinstall.cjs",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md",
-    "llms.txt",
-    "context7.json"
-  ],
-  "os": [
-    "darwin",
-    "linux",
-    "win32"
-  ],
-  "cpu": [
-    "x64",
-    "arm64"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Nathandela/compound-agent.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Nathandela/compound-agent/issues"
-  },
-  "homepage": "https://github.com/Nathandela/compound-agent#readme",
-  "llms": "https://raw.githubusercontent.com/Nathandela/compound-agent/main/llms.txt",
-  "keywords": [
-    "claude",
-    "claude-code",
-    "compound-agent",
-    "ai",
-    "agent",
-    "llm",
-    "cli",
-    "developer-tools",
-    "workflow",
-    "tdd",
-    "knowledge-management"
-  ],
-  "optionalDependencies": {
-    "@syottos/darwin-arm64": "2.12.1",
-    "@syottos/darwin-x64": "2.12.1",
-    "@syottos/linux-arm64": "2.12.1",
-    "@syottos/linux-x64": "2.12.1",
-    "@syottos/win32-x64": "2.12.1",
-    "@syottos/win32-arm64": "2.12.1"
-  },
-  "author": "Nathan Delacrétaz",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18"
+  "devDependencies": {
+    "miniprogram-api-typings": "5.2.3",
+    "typescript": "7.0.2"
   }
 }

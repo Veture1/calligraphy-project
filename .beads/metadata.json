@@ -1,7 +1,0 @@
-{
-  "database": "dolt",
-  "backend": "dolt",
-  "dolt_mode": "server",
-  "dolt_database": "learning_agent",
-  "project_id": "1d91f298-3309-4323-b4c1-d6d1db4d1df9"
-}

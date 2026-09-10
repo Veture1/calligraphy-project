@@ -1,6 +1,0 @@
-description = "Decompose a large system specification into cook-it-ready epic beads"
-prompt = """
-@{.claude/commands/compound/architect.md}
-
-{{args}}
-"""

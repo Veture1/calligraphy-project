@@ -1,6 +1,0 @@
-description = "Full workflow cycle chaining all five phases"
-prompt = """
-@{.claude/commands/compound/cook-it.md}
-
-{{args}}
-"""
