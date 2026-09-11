@@ -11,6 +11,7 @@
 - `services/api/`：统一 API 预留目录，目标技术栈为 NestJS + TypeScript
 - `packages/contracts/`：跨客户端与服务端的公共契约
 - `packages/design-tokens/`：跨客户端的设计令牌
+- `packages/art-assets/`：跨客户端美术资源的 SVG 母版和平台导出物
 - `docs/product/`、`docs/domain/`、`docs/design/`、`docs/engineering/`：分类文档
 - `.codex/`：Codex 项目配置、hooks 和子代理定义
 - `.agents/skills/`：Compound Agent 的 Codex 工作流技能
@@ -20,14 +21,25 @@
 
 - 客户端之间不得互相导入源码；共享边界放在 `packages/`。
 - 微信平台能力只允许出现在小程序适配层或后端微信适配器中，不得进入领域模型。
-- 外部登录身份必须由后端映射到内部 `User`；Student、Pet、Assignment 等领域对象不得依赖 OpenID。
+- 外部登录身份必须由后端映射到内部 `User`；Student、Assignment、宠物蛋孵化进度等领域对象不得依赖 OpenID。
+- 每个碑帖对应一套宠物蛋与孵化后宠物形象；学生学习该碑帖时积累对应经验值，达到阈值后孵化。
+- 美术母版放在 `packages/art-assets/source/` 并保留 SVG；小程序使用从母版导出的 PNG，不把原始母版散落在客户端目录中。
 - 当前小程序新增页面放在 `apps/miniprogram/pages/<页面名>/`，并在 `apps/miniprogram/app.json` 注册。
 - 在后续 Taro 迁移任务完成前，小程序页面逻辑继续使用 TypeScript，界面使用 WXML，样式使用 WXSS。
 - 公共小程序逻辑提取到 `apps/miniprogram/utils/`，避免复制页面业务逻辑。
 - 用户可见文案使用简体中文，并保持短句清晰。
 - 不提交 `node_modules/`、`miniprogram_npm/` 或个人开发者工具配置。
 - 修改 TypeScript 后运行 `pnpm typecheck`。
+- 用户已授权本仓库自动提交和推送：完成并验证仓库修改后，默认提交当前任务的改动并推送当前分支到 `origin`，无需等待再次提醒；只有用户明确要求暂不提交或暂不推送时才停止。
+- 提交前必须检查 `git status` 和 diff，避免夹带与当前任务无关且来源不明的改动。
 - 不要直接编辑 `.compound-agent/lessons/index.jsonl`；使用 `ca learn` 保存经验。
+
+## 文档与 Lesson 边界
+
+- `README.md`、`docs/` 和 ADR 是当前产品计划、领域规则、架构决策与资源规范的权威来源；相关决定变化时直接更新这些文件。
+- lesson 用于记录已经发生的工程问题、失败原因、验证过的解决办法和可复用的防复发规则，以便遇到相似问题时按需召回。
+- 不要用 lesson 代替产品文档、领域文档、设计规范或技术决策，也不要重复保存已经完整写入权威文档的结论。
+- 用户纠正如果改变的是项目设计，应更新对应文档；只有同时产生了独立、可复用的工程经验时，才另外提议记录 lesson。
 
 ## Compound Agent
 

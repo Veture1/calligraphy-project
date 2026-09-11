@@ -4,7 +4,7 @@
 
 This project is a digital companion for calligraphy teaching and long-term practice.
 
-It connects classroom management, assignments, calligraphy materials, practice records, and a lightweight pet progression system within one learning experience.
+It connects classroom management, assignments, calligraphy materials, practice records, and a lightweight copybook pet-egg incubation system within one learning experience.
 
 The product is designed primarily for calligraphy teachers, students, and parents in China. The initial client will be a WeChat Mini Program, while the product domain and backend should remain independent from WeChat so that other clients can be introduced later.
 
@@ -58,7 +58,7 @@ Teaching materials become reusable rather than repeatedly searched for.
 
 Assignments become part of a persistent learning record rather than disappearing into chat history.
 
-Practice becomes visible through作品、学习记录和宠物成长，而不是只通过分数或排名来证明。
+Practice becomes visible through作品、学习记录和宠物蛋孵化，而不是只通过分数或排名来证明。
 
 The product should make teaching easier without making teaching more administrative, and make practice more engaging without turning calligraphy into a game.
 
@@ -94,9 +94,9 @@ Students or parents view assignments and upload completed practice.
 
 Practice records remain visible over time.
 
-Students gain experience through consistent practice, and that accumulated experience is represented through pets associated with the copybooks they study.
+Each copybook corresponds to a pet egg and the pet that can hatch from it. When a student studies a copybook, consistent practice adds experience to that student's progress for the copybook. Once the required experience threshold is reached, the corresponding egg can hatch.
 
-The pet system is therefore not an independent game layered on top of the product.
+The pet-egg system is therefore not an independent game layered on top of the product.
 
 It is a visual representation of accumulated practice.
 
@@ -132,7 +132,7 @@ Primary needs include:
 * uploading practice work;
 * viewing previous work;
 * seeing long-term practice progress;
-* developing pets associated with studied copybooks.
+* incubating and hatching pet eggs associated with studied copybooks.
 
 A Student is a domain entity and does not necessarily correspond to an authenticated User account.
 
@@ -166,7 +166,7 @@ User
       └── Student B
 ```
 
-A Student represents the learner whose attendance, assignments, work, progress, and pets are recorded.
+A Student represents the learner whose attendance, assignments, work, progress, and copybook pet-egg states are recorded.
 
 A User represents a person who can authenticate and operate the product.
 
@@ -198,7 +198,7 @@ Provide a lightweight view of assignments and learning progress without requirin
 
 The product exists to support calligraphy teaching.
 
-The pet system must serve practice rather than dictate the learning process.
+The pet-egg system must serve practice rather than dictate the learning process.
 
 Features should not be introduced solely because they increase engagement if they weaken the educational experience.
 
@@ -214,7 +214,7 @@ A student's progress should primarily be understood relative to their own previo
 
 Assignments should not disappear after submission.
 
-Attendance, uploaded work, studied copybooks, teacher feedback, and pet progression should together form a persistent learning history.
+Attendance, uploaded work, studied copybooks, teacher feedback, and pet-egg incubation should together form a persistent learning history.
 
 ### 8.4 Student interaction should remain lightweight
 
@@ -255,7 +255,7 @@ The product should avoid reducing Chinese calligraphy to generic decorative symb
 
 ### 8.7 Gamification should retain restraint
 
-Pets may provide character, attachment, and visible progression, but should not overwhelm the learning interface.
+Pet eggs and the pets hatched from them may provide character, attachment, and visible progression, but should not overwhelm the learning interface.
 
 The product is not a pet-collection game containing a calligraphy feature.
 
@@ -292,7 +292,7 @@ Teacher reviews completion
         ↓
 Practice contributes to learning history
         ↓
-Pet progression reflects accumulated practice
+Copybook pet-egg experience reaches its hatching threshold
 ```
 
 The initial product should therefore concentrate on:
@@ -306,7 +306,7 @@ The initial product should therefore concentrate on:
 * practice history;
 * copybook association;
 * experience accumulation;
-* pet progression;
+* pet-egg experience and hatching;
 * basic teaching-material organization.
 
 Detailed feature requirements belong in `PRD.md`.
@@ -365,7 +365,7 @@ Qualitative indicators include:
 
 * students can understand and submit assignments without explanation;
 * previous practice remains easy to revisit;
-* pet progression makes accumulated practice perceptible;
+* pet-egg incubation and hatching make accumulated practice perceptible;
 * the system encourages continuation without creating pressure to compete.
 
 ### Parent
@@ -422,12 +422,12 @@ The following questions remain intentionally unresolved and should be addressed 
 * Is attendance attached to a Lesson, a ClassSession, or another explicit session entity?
 * Should check-in use QR codes, numeric codes, teacher confirmation, or several mechanisms?
 
-### Pets
+### Pet eggs and hatching
 
-* Does a student own one pet per copybook?
-* Can the same pet continue growing across different teachers or classes?
-* What exactly triggers evolution?
+* Does a student's progress for the same copybook continue across different teachers or classes?
+* Does hatching happen automatically at the threshold or require an explicit student action?
 * Is experience determined purely by completion or partly by teacher evaluation?
+* Does the pet have additional growth stages after hatching?
 
 ### Teaching materials
 

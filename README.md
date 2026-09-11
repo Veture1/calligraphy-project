@@ -13,7 +13,8 @@ calligraphy/
 │   └── api/               # 目标 NestJS + TypeScript
 ├── packages/
 │   ├── contracts/         # 公共接口契约
-│   └── design-tokens/     # 公共设计令牌
+│   ├── design-tokens/     # 公共设计令牌
+│   └── art-assets/        # SVG 美术母版与各客户端导出物
 ├── docs/
 │   ├── product/
 │   ├── domain/
@@ -43,6 +44,10 @@ calligraphy/
                             产品 token/session
 ```
 
-微信 AppSecret 只属于后端。OpenID 是外部 Identity，不是业务 User ID；未来增加 Apple 或手机号身份时，Student、Pet、Assignment 等领域模型不随登录方式变化。
+微信 AppSecret 只属于后端。OpenID 是外部 Identity，不是业务 User ID；未来增加 Apple 或手机号身份时，Student、Assignment、宠物蛋孵化进度等领域模型不随登录方式变化。
 
-详细决策见 [`docs/engineering/技术决策.md`](docs/engineering/技术决策.md)。
+仓库与身份边界的详细决策见 [`docs/engineering/技术决策.md`](docs/engineering/技术决策.md)。
+
+## 宠物蛋系统
+
+每个碑帖对应一套宠物蛋与孵化后宠物形象。学生学习该碑帖时积累对应经验值，达到阈值后宠物蛋可以孵化。详细业务规则见 [`docs/domain/宠物蛋系统.md`](docs/domain/宠物蛋系统.md)，资源规范见 [`docs/design/美术资源.md`](docs/design/美术资源.md)。

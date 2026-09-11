@@ -9,3 +9,5 @@
 ```
 
 微信 AppSecret、OpenID 和 session key 不得进入客户端或公共业务模型。
+
+宠物蛋业务接口使用碑帖标识、稳定资源键和孵化状态表达业务数据，不依赖 `apps/*` 或 `packages/art-assets` 中的本地文件路径。

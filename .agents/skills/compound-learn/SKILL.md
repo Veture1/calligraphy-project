@@ -1,6 +1,6 @@
 ---
 name: compound-learn
-description: Capture durable lessons after corrections, resolved failures, or significant project decisions without bloating project memory.
+description: Capture durable engineering lessons after corrections, resolved failures, or discoveries without duplicating canonical project documentation.
 ---
 
 # Compound Learn
@@ -8,6 +8,11 @@ description: Capture durable lessons after corrections, resolved failures, or si
 Review the task, diff, failures, corrections, and decisions. A lesson is worth storing
 only when it is novel, project-specific, and actionable. Search for duplicates with
 `ca search` before adding anything.
+
+Canonical product plans, domain rules, design specifications, and accepted architecture
+belong in the relevant README, document, or ADR. They are not lessons. A lesson should
+capture a reusable problem pattern: what failed or was risky, why it happened, the
+verified remedy, and the guardrail that should prevent recurrence.
 
 Use `ca learn` to store lessons; never edit `.compound-agent/lessons/index.jsonl`
 directly. Classify the item as a lesson, solution, pattern, or preference and connect
