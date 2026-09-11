@@ -1,7 +1,7 @@
 {
   "description": "书法学习微信小程序",
   "compileType": "miniprogram",
-  "miniprogramRoot": "miniprogram/",
+  "miniprogramRoot": "./",
   "appid": "touristappid",
   "projectname": "calligraphy-project",
   "libVersion": "trial",
@@ -12,4 +12,3 @@
     "useCompilerPlugins": ["typescript"]
   }
 }
-

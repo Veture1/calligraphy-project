@@ -2,9 +2,9 @@
   "name": "calligraphy-project",
   "version": "0.1.0",
   "private": true,
-  "description": "书法学习微信小程序",
+  "description": "书法学习多客户端产品",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit -p apps/miniprogram/tsconfig.json"
   },
   "devDependencies": {
     "miniprogram-api-typings": "5.2.3",

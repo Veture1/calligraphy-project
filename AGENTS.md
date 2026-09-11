@@ -2,23 +2,28 @@
 
 ## 项目概览
 
-本仓库用于开发书法学习微信小程序。应用代码使用原生微信小程序技术栈：TypeScript、WXML、WXSS 和 JSON。
+本仓库用于开发书法学习产品。微信小程序、教师 Web 和未来客户端都是产品的独立 client，共同通过后端服务访问业务能力。
 
 ## 目录结构
 
-- `miniprogram/app.*`：小程序入口和全局样式
-- `miniprogram/pages/`：页面代码
-- `miniprogram/sitemap.json`：页面索引规则
-- `types/`：项目级 TypeScript 类型
+- `apps/miniprogram/`：微信小程序客户端；当前为原生 TypeScript、WXML、WXSS，目标技术栈为 Taro + React + TypeScript
+- `apps/teacher-web/`：教师 Web 客户端预留目录，目标技术栈为 React + Vite + TypeScript
+- `services/api/`：统一 API 预留目录，目标技术栈为 NestJS + TypeScript
+- `packages/contracts/`：跨客户端与服务端的公共契约
+- `packages/design-tokens/`：跨客户端的设计令牌
+- `docs/product/`、`docs/domain/`、`docs/design/`、`docs/engineering/`：分类文档
 - `.codex/`：Codex 项目配置、hooks 和子代理定义
 - `.agents/skills/`：Compound Agent 的 Codex 工作流技能
 - `.compound-agent/`：Compound Agent 的经验数据
 
 ## 开发约定
 
-- 新页面放在 `miniprogram/pages/<页面名>/`，并在 `miniprogram/app.json` 注册。
-- 页面逻辑使用 TypeScript，界面使用 WXML，样式使用 WXSS。
-- 公共逻辑提取到 `miniprogram/utils/`，避免复制页面业务逻辑。
+- 客户端之间不得互相导入源码；共享边界放在 `packages/`。
+- 微信平台能力只允许出现在小程序适配层或后端微信适配器中，不得进入领域模型。
+- 外部登录身份必须由后端映射到内部 `User`；Student、Pet、Assignment 等领域对象不得依赖 OpenID。
+- 当前小程序新增页面放在 `apps/miniprogram/pages/<页面名>/`，并在 `apps/miniprogram/app.json` 注册。
+- 在后续 Taro 迁移任务完成前，小程序页面逻辑继续使用 TypeScript，界面使用 WXML，样式使用 WXSS。
+- 公共小程序逻辑提取到 `apps/miniprogram/utils/`，避免复制页面业务逻辑。
 - 用户可见文案使用简体中文，并保持短句清晰。
 - 不提交 `node_modules/`、`miniprogram_npm/` 或个人开发者工具配置。
 - 修改 TypeScript 后运行 `pnpm typecheck`。
@@ -27,6 +32,16 @@
 ## Compound Agent
 
 本项目只接入 Codex。使用 `$compound-spec-dev`、`$compound-plan`、`$compound-work`、`$compound-review`、`$compound-learn` 或 `$compound-cook-it` 运行相应工作流。
+
+### 会话启动与加载失败兜底
+
+- 每次根 Codex 会话启动、恢复、清空或完成上下文压缩后，必须先确认当前开发者上下文中存在 `# Compound Agent Active` 标记，再开始项目分析、规划、读取或修改文件。
+- 如果没有看到该标记，必须立即在仓库根目录运行 `ca prime`，并把它输出的规则和 Mandatory Recall lessons 作为本次会话的强制上下文。
+- `ca prime` 输出 `# Compound Agent Active` 但没有列出 lesson，表示加载成功且当前没有符合条件的高严重度经验，不得把空列表误判为失败。
+- 如果找不到 `ca`，先运行 `ca version` 检查全局安装，再读取 `.codex/hooks.json` 中当前平台的绝对命令路径并直接执行其中的 `ca prime`。
+- 如果 `ca prime` 返回非零状态、超时，或输出中仍没有 `# Compound Agent Active`，必须向用户报告原始错误和已经尝试的命令。在恢复加载前，不得进行架构决策或修改项目文件，除非用户明确要求忽略本次加载失败并继续。
+- 不得因为 `.codex/hooks.json` 的 hook 使用了静默错误处理而假定加载成功；以上标记检查是项目级兜底规则。
+
 <!-- compound-agent:start -->
 ## Compound Agent Integration
 
